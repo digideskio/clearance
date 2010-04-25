@@ -89,7 +89,15 @@ class PasswordsControllerTest < ActionController::TestCase
       should_render_template "edit"
       should_display_a_password_update_form
     end
-
+    
+    context "on GET to #edit with correct id but incorrect token" do
+      setup do
+        get :edit, :user_id => @user.to_param, :token => @user.confirmation_token + "1"
+      end
+      
+      should_redirect_to("the sing in page") { sign_in_path }
+    end
+    
     should_forbid "on GET to #edit with correct id but blank token" do
       get :edit, :user_id => @user.to_param, :token => ""
     end

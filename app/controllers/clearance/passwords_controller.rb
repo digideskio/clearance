@@ -3,7 +3,7 @@ class Clearance::PasswordsController < ApplicationController
 
   skip_before_filter :authenticate,        :only => [:new, :create, :edit, :update]
   before_filter :forbid_missing_token,     :only => [:edit, :update]
-  before_filter :forbid_non_existent_user, :only => [:edit, :update]
+  before_filter :redirect_on_incorrect_token, :only => [:edit, :update]
   filter_parameter_logging :password, :password_confirmation
 
   def new
@@ -51,10 +51,13 @@ class Clearance::PasswordsController < ApplicationController
     end
   end
 
-  def forbid_non_existent_user
+  def redirect_on_incorrect_token
     unless ::User.find_by_id_and_confirmation_token(
                   params[:user_id], params[:token])
-      raise ActionController::Forbidden, "non-existent user"
+      flash[:notice] = translate(:token_expired,
+        :scope => [:clearance, :controllers, :passwords],
+        :default => "This token has expired. Please check your email for a newer link.")
+      redirect_to sign_in_url
     end
   end
 
