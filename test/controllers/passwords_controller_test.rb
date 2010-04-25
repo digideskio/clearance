@@ -95,7 +95,7 @@ class PasswordsControllerTest < ActionController::TestCase
         get :edit, :user_id => @user.to_param, :token => @user.confirmation_token + "1"
       end
       
-      should_redirect_to("the sing in page") { sign_in_path }
+      should_redirect_to("the sign in page") { sign_in_path }
     end
     
     should_forbid "on GET to #edit with correct id but blank token" do
